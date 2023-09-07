@@ -10,8 +10,8 @@
 			ID: {{ artist.id }}
 		</p>
 		<div class="genres">
-			{% for genre in artist.genres %}
-			<span class="genre">{{ genre }}</span>
+			{% for genre in artist.genres.split() %}
+			<span class="genre">{{ genre.strip('{}') }}</span>
 			{% endfor %}
 		</div>
 		<p>
