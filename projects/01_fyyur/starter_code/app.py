@@ -201,25 +201,17 @@ def show_venue(venue_id):
       "upcoming_shows_count": venue.upcoming_showsCount
     }
 
-  past_shows = []
-  for show in venue.past_shows:
+  def get_show_info(show):
     artist = Artist.query.get(show.artist_id)
-    past_shows.append({
-      "artist_id": show.artist_id,
-      "artist_name": artist.name,
-      "artist_image_link": artist.image_link,
-      "start_time": str(show.start_time)
-    })
+    return {
+        "artist_id": show.artist_id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": str(show.start_time)
+    }
 
-  upcoming_shows = []
-  for show in venue.upcoming_shows:
-    artist = Artist.query.get(show.artist_id)
-    upcoming_shows.append({
-      "artist_id": show.artist_id,
-      "artist_name": artist.name,
-      "artist_image_link": artist.image_link,
-      "start_time": str(show.start_time)
-    })
+  past_shows = [get_show_info(show) for show in venue.past_shows]
+  upcoming_shows = [get_show_info(show) for show in venue.upcoming_shows]
 
   data["past_shows"] = past_shows
   data["upcoming_shows"] = upcoming_shows
@@ -266,7 +258,7 @@ def create_venue_submission():
   return render_template('pages/home.html')
   # return redirect(url_for('venues'))
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/delvenues/<int:venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
@@ -279,13 +271,12 @@ def delete_venue(venue_id):
   except():
     flash('An error occurred. Venue ' + venue.name + ' could not be deleted.')
     db.session.rollback()
-    return None
 
   finally:
     db.session.close()
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  return render_template('pages/home.html')
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -320,8 +311,6 @@ def search_artists():
 def show_artist(artist_id):
   # shows the artist page with the given artist_id
   # TODO: replace with real artist data from the artist table, using artist_id
-
-  # data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
   artist = Artist.query.get(artist_id)
   past_shows = []
   for show in artist.past_shows:
@@ -488,12 +477,14 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
 
-  queries = Show.query.join(
-    Venue, (Venue.id == Show.venue_id)
-  ).join(
-    Artist, (Artist.id == Show.artist_id)
-  ).with_entities(Show.venue_id, Venue.name.label('venue_name'), Show.artist_id, Artist.name.label('artist_name'), Artist.image_link, Show.start_time)
-
+  queries = Show.query.join(Venue).join(Artist).with_entities(
+    Show.venue_id,
+    Venue.name.label('venue_name'),
+    Show.artist_id,
+    Artist.name.label('artist_name'),
+    Artist.image_link,
+    Show.start_time
+  )
   data=[]
   for query in queries:
     data.append({
