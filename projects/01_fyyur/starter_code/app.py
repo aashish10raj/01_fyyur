@@ -147,7 +147,6 @@ def venues():
     city=cityState[0]
     state=cityState[1]
     venues = Venue.query.filter_by(city=city, state=state).all()
-    shows = venues[0].upcoming_shows
     data.append({
       "city": city,
       "state": state,
@@ -197,7 +196,7 @@ def show_venue(venue_id):
       "facebook_link": venue.facebook_link,
       "seeking_talent": True if venue.seeking_talent in (True, 't', 'True') else False,
       "seeking_description": venue.seeking_description,
-      "image_link": venue.image_link if venue.image_link else "",
+      "image_link": venue.image_link,
       "past_shows_count": venue.past_showsCount,
       "upcoming_shows_count": venue.upcoming_showsCount
     }
@@ -237,17 +236,21 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-  venue = Venue()
-  for field in request.form:
-    if field == 'genres':
-      setattr(venue, field, request.form.getlist(field))
-    elif field == 'seeking_talent':
-      setattr(venue, field, True if request.form.get(field) in ('y', True, 't', 'True') else False)
-    else:
-      setattr(venue, field, request.form.get(field))
+  # # TODO: modify data to be the data object returned from db insertion
 
   try:
+    name = request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    address = request.form['address']
+    phone = request.form['phone']
+    genres = request.form.getlist('genres')
+    image_link = request.form['image_link']
+    facebook_link = request.form['facebook_link']
+    website_link = request.form['website_link']
+    seeking_talent = True if 'seeking_talent' in request.form else False
+    seeking_description = request.form['seeking_description']
+    venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
     db.session.add(venue)
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
@@ -374,22 +377,25 @@ def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
   artist = Artist.query.get(artist_id)
-  for field in request.form:
-    if field == 'genres':
-      setattr(artist, field, request.form.getlist(field))
-    elif field == 'seeking_venue':
-      setattr(artist, field, True if request.form.get(field) in ('y', True, 't', 'True') else False)
-    else:
-      setattr(artist, field, request.form.get(field))
 
   try:
+    artist.name = request.form['name']
+    artist.city = request.form['city']
+    artist.state = request.form['state']
+    artist.phone = request.form['phone']
+    artist.genres = request.form.getlist('genres')
+    artist.image_link = request.form['image_link']
+    artist.facebook_link = request.form['facebook_link']
+    artist.website_link = request.form['website_link']
+    artist.seeking_venue = True if 'seeking_venue' in request.form else False
+    artist.seeking_description = request.form['seeking_description']
     db.session.add(artist)
     db.session.commit()
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    flash('Artist ' + request.form['name'] + ' was successfully edited')
 
   except():
     db.session.rollback()
-    flash('Artist ' + request.form['name'] + ' was not listed!')
+    flash('Artist ' + request.form['name'] + ' was not edited!')
     db.session.close()
   finally:
     db.session.close()
@@ -408,14 +414,18 @@ def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   venue = Venue.query.get(venue_id)
-  for field in request.form:
-    if field == 'genres':
-      setattr(venue, field, request.form.getlist(field))
-    elif field == 'seeking_talent':
-      setattr(venue, field, True if request.form.get(field) in ('y', True, 't', 'True') else False)
-    else:
-      setattr(venue, field, request.form.get(field))
   try:
+    venue.name = request.form['name']
+    venue.city = request.form['city']
+    venue.state = request.form['state']
+    venue.address = request.form['address']
+    venue.phone = request.form['phone']
+    venue.genres = request.form.getlist('genres')
+    venue.image_link = request.form['image_link']
+    venue.facebook_link = request.form['facebook_link']
+    venue.website_link = request.form['website_link']
+    venue.seeking_talent = True if 'seeking_talent' in request.form else False
+    venue.seeking_description = request.form['seeking_description']
     db.session.add(venue)
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
@@ -442,16 +452,19 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  artist = Artist()
-  for field in request.form:
-    if field == 'genres':
-      setattr(artist, field, request.form.getlist(field))
-    elif field == 'seeking_venue':
-      setattr(artist, field, True if request.form.get(field) in ('y', True, 't', 'True') else False)
-    else:
-      setattr(artist, field, request.form.get(field))
 
   try:
+    name = request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    phone = request.form['phone']
+    genres = request.form.getlist('genres'),
+    facebook_link = request.form['facebook_link']
+    image_link = request.form['image_link']
+    website_link = request.form['website_link']
+    seeking_venue = True if 'seeking_venue' in request.form else False
+    seeking_description = request.form['seeking_description']
+    artist = Artist(name=name, city=city, state=state, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description)
     db.session.add(artist)
     db.session.commit()
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
