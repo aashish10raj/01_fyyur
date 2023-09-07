@@ -52,7 +52,7 @@ class Venue(db.Model):
     #implementing the cout of past and future shows
     @property
     def upcoming_shows(self):
-      upcoming_shows = Show.query.filter(Show.start_time > datetime.now())
+      upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.venue_id==self.id)
       return upcoming_shows
     @property
     def upcoming_showsCount(self):
@@ -60,7 +60,7 @@ class Venue(db.Model):
 
     @property
     def past_shows(self):
-      past_shows = Show.query.filter(Show.start_time < datetime.now())
+      past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.venue_id==self.id)
       return past_shows
 
     @property
@@ -87,7 +87,7 @@ class Artist(db.Model):
     #implementing the past and future shows with respect to artists
     @property
     def upcoming_shows(self):
-      upcoming_shows = Show.query.filter(Show.start_time > datetime.now())
+      upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.venue_id==self.id)
       return upcoming_shows
     @property
     def upcoming_showsCount(self):
@@ -95,7 +95,7 @@ class Artist(db.Model):
 
     @property
     def past_shows(self):
-      past_shows = Show.query.filter(Show.start_time < datetime.now())
+      past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.venue_id==self.id)
       return past_shows
 
     @property
@@ -272,7 +272,6 @@ def delete_venue(venue_id):
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
   venue = Venue.query.get(venue_id)
   try:
-    # venue.delete()
     db.session.delete(venue)
     db.session.commit()
     flash('Venue ' + venue.name + ' was successfully deleted!')
