@@ -52,20 +52,20 @@ class Venue(db.Model):
     #implementing the cout of past and future shows
     @property
     def upcoming_shows(self):
-      upcoming_shows = [show for show in self.shows if show.start_time > datetime.now()] #datetime.strptime(show.start_time, '%Y-%m-%d %H:%M:%S') > now]
+      upcoming_shows = Show.query.filter(Show.start_time > datetime.now())
       return upcoming_shows
     @property
     def upcoming_showsCount(self):
-      return len(self.upcoming_shows)
+      return self.upcoming_shows.count()
 
     @property
     def past_shows(self):
-      past_shows = [show for show in self.shows if show.start_time < datetime.now()]
+      past_shows = Show.query.filter(Show.start_time < datetime.now())
       return past_shows
 
     @property
     def past_showsCount(self):
-      return len(self.past_shows)
+      return self.past_shows.count()
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -87,20 +87,20 @@ class Artist(db.Model):
     #implementing the past and future shows with respect to artists
     @property
     def upcoming_shows(self):
-      upcoming_shows = [show for show in self.shows if show.start_time > datetime.now()]
+      upcoming_shows = Show.query.filter(Show.start_time > datetime.now())
       return upcoming_shows
     @property
     def upcoming_showsCount(self):
-      return len(self.upcoming_shows)
+      return self.upcoming_shows.count()
 
     @property
     def past_shows(self):
-      past_shows = [show for show in self.shows if show.start_time < datetime.now()]
+      past_shows = Show.query.filter(Show.start_time < datetime.now())
       return past_shows
 
     @property
     def past_showsCount(self):
-      return len(self.past_shows)
+      return self.upcoming_shows.count()
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
