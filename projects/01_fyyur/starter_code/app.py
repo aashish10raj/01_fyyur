@@ -229,34 +229,31 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # # TODO: modify data to be the data object returned from db insertion
-
-  try:
-    name = request.form['name']
-    city = request.form['city']
-    state = request.form['state']
-    address = request.form['address']
-    phone = request.form['phone']
-    genres = request.form.getlist('genres')
-    image_link = request.form['image_link']
-    facebook_link = request.form['facebook_link']
-    website_link = request.form['website_link']
-    seeking_talent = True if 'seeking_talent' in request.form else False
-    seeking_description = request.form['seeking_description']
-    venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
+  # # TODO: on unsuccessful db insert, flash an error instead.
+  form = VenueForm(request.form)
+  if form.validate():
+    venue = Venue(
+      name=form.name.data,
+      city=form.city.data,
+      state=form.state.data,
+      address=form.address.data,
+      phone=form.phone.data,
+      image_link=form.image_link.data,
+      facebook_link=form.facebook_link.data,
+      website_link=form.website_link.data,
+      genres=form.genres.data,
+      seeking_talent=form.seeking_talent.data,
+      seeking_description=form.seeking_description.data
+    )
     db.session.add(venue)
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
-
-  except():
-    db.session.rollback()
-    flash('An error occurred. Venue could not be listed. \n' + sys.exc_info)
-    return render_template('pages/home.html')
-
-  finally:
-    db.session.close()
-  # TODO: on unsuccessful db insert, flash an error instead.
-  return render_template('pages/home.html')
-  # return redirect(url_for('venues'))
+    return redirect(url_for('venues'))
+  else:
+      for field, message in form.errors.items():
+        flash(field +'-'+str(message),'danger')
+    # flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+  return redirect(url_for('venues'))
 
 @app.route('/delvenues/<int:venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -457,32 +454,31 @@ def create_artist_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
-  try:
-    name = request.form['name']
-    city = request.form['city']
-    state = request.form['state']
-    phone = request.form['phone']
-    genres = request.form.getlist('genres'),
-    facebook_link = request.form['facebook_link']
-    image_link = request.form['image_link']
-    website_link = request.form['website_link']
-    seeking_venue = True if 'seeking_venue' in request.form else False
-    seeking_description = request.form['seeking_description']
-    artist = Artist(name=name, city=city, state=state, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description)
+  form = ArtistForm(request.form)
+  if form.validate():
+    artist = Artist(
+      name=form.name.data,
+      city=form.city.data,
+      state=form.state.data,
+      phone=form.phone.data,
+      genres=form.genres.data,
+      image_link=form.image_link.data,
+      facebook_link=form.facebook_link.data,
+      website_link=form.website_link.data,
+      seeking_venue=form.seeking_venue.data,
+      seeking_description=form.seeking_description.data
+    )
     db.session.add(artist)
     db.session.commit()
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  except:
-    db.session.rollback()
-    flash('An error occurred. Artist ' + artist.name + ' was not listed.')
-    #return render_template('pages/home.html')
-  finally:
-    db.session.close()
-  # on successful db insert, flash success
-  # flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+    return redirect(url_for('artists'))
+  else:
+    for field, message in form.errors.items():
+      flash(field +'-'+str(message),'danger')
+    # flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+  return redirect(url_for('venues'))
+    # flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+
 
 
 #  Shows
