@@ -87,7 +87,7 @@ class Artist(db.Model):
     #implementing the past and future shows with respect to artists
     @property
     def upcoming_shows(self):
-      upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.venue_id==self.id)
+      upcoming_shows = Show.query.filter(Show.start_time > datetime.now(), Show.artist_id==self.id)
       return upcoming_shows
     @property
     def upcoming_showsCount(self):
@@ -95,12 +95,12 @@ class Artist(db.Model):
 
     @property
     def past_shows(self):
-      past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.venue_id==self.id)
+      past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.artist_id==self.id)
       return past_shows
 
     @property
     def past_showsCount(self):
-      return self.upcoming_shows.count()
+      return self.past_shows.count()
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
@@ -330,6 +330,20 @@ def show_artist(artist_id):
       "venue_image_link": venue.image_link,
       "start_time": show.start_time
     })
+  # if artist:
+  #   def get_show_info(show):
+  #     venue = Venue.query.get(show.venue_id)
+  #     return {
+  #       "venue_id": show.venue_id,
+  #       "venue_name": venue.name,
+  #       "venue_image_link": venue.image_link,
+  #       "start_time": str(show.start_time)
+  #     }
+  #
+  # past_shows = [get_show_info(show) for show in artist.past_shows]
+  # upcoming_shows = [get_show_info(show) for show in artist.upcoming_shows]
+  #
+  #
   data = {
     "id": artist.id,
     "name": artist.name,
@@ -341,12 +355,14 @@ def show_artist(artist_id):
     "seeking_description": artist.seeking_description,
     "image_link": artist.image_link,
     "facebook_link": artist.facebook_link,
-    "website_link": artist.website_link,
+    "website": artist.website_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
     "past_shows_count": artist.past_showsCount,
     "upcoming_shows_count": artist.upcoming_showsCount
   }
+  # data["past_shows"] = past_shows
+  # data["upcoming_shows"] = upcoming_shows
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
