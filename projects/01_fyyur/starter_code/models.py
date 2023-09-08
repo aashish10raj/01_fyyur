@@ -90,7 +90,7 @@ class Artist(db.Model):
     @property
     def past_shows(self):
         # past_shows = Show.query.filter(Show.start_time < datetime.now(), Show.artist_id==self.id)
-        past_shows=db.session.query(Show).join(Venue).filter(Show.venue_id==self.id).filter(
+        past_shows=db.session.query(Show).join(Venue).filter(Show.artist_id==self.id).filter(
             Show.start_time < datetime.now()
         )
         return past_shows
